@@ -3,7 +3,7 @@ import pandas as pd
 import matplotlib
 import re
 
-file = "/mnt/c/Users/Usuario/Downloads/steam_games.csv"
+file = "raw_data/steam_games.csv"
 df = pd.read_csv(file)
 
 def limpieza(df):
