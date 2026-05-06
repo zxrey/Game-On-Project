@@ -3,9 +3,6 @@ import pandas as pd
 import matplotlib
 import re
 
-file = "raw_data/steam_games.csv"
-df = pd.read_csv(file)
-
 def limpieza(df):
     # Limpieza de 'recent_reviews'
     def extract_percentage(text):
