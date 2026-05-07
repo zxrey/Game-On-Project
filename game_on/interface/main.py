@@ -1,3 +1,4 @@
+import pandas as pd
 from pln_model.limpieza import limpieza
 from pln_model.sbert import generar_embeddings, query
 
@@ -9,10 +10,10 @@ def main():
     data_limpia = limpieza(df)
 
     # Generar embeddings con sbert.py
-    embeddings = generar_embeddings(data_limpia)
+    game_embeddings = embedding(df)
 
     # Ejecutar query (consulta)
-    resultado = query("tu consulta", data_limpia, embeddings, n_top=5)
+    resultado = query("tu consulta", df, game_embeddings, n_top=5)
 
     print(resultado)
 
