@@ -1,6 +1,6 @@
 import pandas as pd
 from pln_model.limpieza import limpieza
-from pln_model.sbert import generar_embeddings, query
+from pln_model.sbert import embedding, query
 
 def main():
     # Cargar dataset local, por ejemplo un CSV
