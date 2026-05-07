@@ -6,7 +6,7 @@ def main():
     df = pd.read_csv('/mnt/c/Users/Usuario/Downloads/steam_games.csv')
 
     # Limpiar dataset
-    data_limpia = limpieza(df1)
+    data_limpia = limpieza(df)
 
     # Generar embeddings con sbert.py
     embeddings = generar_embeddings(data_limpia)
