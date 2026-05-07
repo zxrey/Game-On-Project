@@ -19,7 +19,7 @@ def embedding(df):
 
 
 def query(consulta, df, game_embeddings, n_top=5):
-    '''Este funcion es para colocar la consulta y devolver la similitud con el embedding'''
+    '''Esta funcion recibe una consulta y retorna los juegos más similares'''
     # Vectorizamos la consulta del usuario
     query_embedding = model.encode(consulta, convert_to_tensor=True)
 
@@ -29,17 +29,18 @@ def query(consulta, df, game_embeddings, n_top=5):
     # Obtenemos los mejores N resultados
     top_results = torch.topk(cosine_scores, k=n_top)
 
-    # Mostramos resultados
-    print(f"🔎 Resultados para: '{consulta}'\n")
-    print("="*50)
-
+    # Retornamos resultados como lista de diccionarios
+    resultados = []
     for score, idx in zip(top_results.values, top_results.indices):
         game = df.iloc[idx.item()]
-        print(f"🎮 JUEGO: {game['name']}")
-        print(f"📊 Match: {score:.2%}")
-        print(f"📂 {game['genre']}")
-        print(f"{game['popular_tags']}")
-        print(f"💰 Precio: {game['original_price']}")
-        print(f"⭐ {game['review_percentage']}")
-        print(f"🔗 Link: {game['url']}")
-        print("-" * 50)
+        resultados.append({
+            'name': game['name'],
+            'match': round(score.item(), 4),
+            'genre': game['genre'],
+            'popular_tags': game['popular_tags'],
+            'original_price': game['original_price'],
+            'review_percentage': game['review_percentage'],
+            'url': game['url']
+        })
+
+    return resultados

@@ -13,7 +13,7 @@ def main():
     data_limpia, game_embeddings = embedding(df)
 
     # Ejecutar query (consulta)
-    resultado = query("tu consulta", data_limpia, game_embeddings, n_top=5)
+    resultado = query("kill demon hordes, Gore, single player, shooter, first person", data_limpia, game_embeddings, n_top=5)
 
     print(resultado)
 
