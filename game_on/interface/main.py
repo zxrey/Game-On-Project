@@ -9,11 +9,11 @@ def main():
     # Limpiar dataset
     data_limpia = limpieza(df)
 
-    # Generar embeddings con sbert.py
-    game_embeddings = embedding(df)
+    # Generar embeddings (incluye limpieza dentro)
+    data_limpia, game_embeddings = embedding(df)
 
     # Ejecutar query (consulta)
-    resultado = query("tu consulta", df, game_embeddings, n_top=5)
+    resultado = query("tu consulta", data_limpia, game_embeddings, n_top=5)
 
     print(resultado)
 
