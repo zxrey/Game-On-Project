@@ -1,10 +1,11 @@
 import pandas as pd
 from pln_model.limpieza import limpieza
 from pln_model.sbert import embedding, query
+import os
 
 def main():
     # Cargar dataset local, por ejemplo un CSV
-    df = pd.read_csv('/mnt/c/Users/Usuario/Downloads/steam_games.csv')
+    df = pd.read_csv(os.getenv("CSV_PATH"))
 
     # Limpiar dataset
     data_limpia = limpieza(df)
