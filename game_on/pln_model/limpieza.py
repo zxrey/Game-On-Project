@@ -60,7 +60,7 @@ def limpieza(df, df1):
     # Si required_age es 0 se reemplaza con 'Para todas las edades',
     # si tiene un número mayor se reemplaza con 'Juego para mayores de X'
     df1['required_age'] = df1['required_age'].apply(
-        lambda x: f"Para todas las edades" if x == 0 else f"Juego para personas mayores de {x} años"
+        lambda x: f"For all ages" if x == 0 else f"Game for people over {x} years old"
     )
 
     # Estandarizamos appid a string en ambos DataFrames para evitar errores en el merge
@@ -72,7 +72,7 @@ def limpieza(df, df1):
 
 
     # Formateo de columnas para embedding
-    df['review_percentage'] = df['review_percentage'].apply(lambda x: f"Porcentaje de recomendación de jugadores: {int(x)}%" if pd.notna(x) else x)
+    df['review_percentage'] = df['review_percentage'].apply(lambda x: f"Percentage of player recommendations: {int(x)}%" if pd.notna(x) else x)
     df['popular_tags'] = df['popular_tags'].apply(lambda x: f"Tags populares: {x}" if pd.notna(x) else x)
     df['game_details'] = df['game_details'].apply(lambda x: f"Tags populares: {x}" if pd.notna(x) else x)
     df['genre'] = df['genre'].apply(lambda x: f"Genero de juego: {x}" if pd.notna(x) else x)
