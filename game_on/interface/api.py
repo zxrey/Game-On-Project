@@ -9,7 +9,8 @@ load_dotenv(os.path.join(os.path.dirname(__file__), '../../.env'))
 app = FastAPI()
 
 df = pd.read_csv(os.getenv("CSV_PATH"))
-data_limpia, game_embeddings = embedding(df)
+df1 = pd.read_csv(os.getenv("CSV_PATH_IMG"))
+data_limpia, game_embeddings = embedding(df, df1)
 
 @app.post("/query")
 def recomendar(payload: dict):

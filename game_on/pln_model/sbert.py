@@ -7,9 +7,9 @@ from pln_model.limpieza import limpieza
 model_name = 'all-MiniLM-L6-v2'
 model = SentenceTransformer(model_name)
 
-def embedding(df):
+def embedding(df, df1):
     # Limpieza del dataframe
-    df = limpieza(df)
+    df = limpieza(df, df1)
 
     # Eliminamos filas con embedding nulo y generamos los vectores
     df = df.dropna(subset=['embedding'])

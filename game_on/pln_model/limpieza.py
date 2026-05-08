@@ -3,7 +3,7 @@ import pandas as pd
 import matplotlib
 import re
 
-def limpieza(df):
+def limpieza(df, df1):
     # Limpieza de 'recent_reviews'
     def extract_percentage(text):
         if not isinstance(text, str):
@@ -30,6 +30,9 @@ def limpieza(df):
     df['release_date'] = df['release_date'].str.extract(r'(\d{4})(?!.*\d{4})')
     df['release_date'] = df['release_date'].astype(int)
 
+    #Creacion de columna APIid extraida de URL
+    df['appid'] = df['url'].str.extract(r'/app/(\d+)')
+
     # Limpieza de 'game_description'
     def clean_text(text):
         if pd.isna(text):
@@ -46,6 +49,28 @@ def limpieza(df):
     df['original_price'] = pd.to_numeric(df['original_price'], errors='coerce')
     df['original_price'] = df['original_price'].fillna(0.0)
 
+    # Merge con segunda base de datos
+    df1 = df1[['header_image', 'required_age', 'short_description', 'appid', 'metacritic_score']].copy()
+    # Elimina el símbolo '+' de valores como '17+' para poder convertirlos a número
+    df1['required_age'] = df1['required_age'].astype(str).str.replace('+', '', regex=False)
+
+    # Convierte a número entero, los valores inválidos (javascript, texto) se reemplazan con 0
+    df1['required_age'] = pd.to_numeric(df1['required_age'], errors='coerce').fillna(0).astype(int)
+
+    # Si required_age es 0 se reemplaza con 'Para todas las edades',
+    # si tiene un número mayor se reemplaza con 'Juego para mayores de X'
+    df1['required_age'] = df1['required_age'].apply(
+        lambda x: f"Para todas las edades" if x == 0 else f"Juego para personas mayores de {x} años"
+    )
+
+    # Estandarizamos appid a string en ambos DataFrames para evitar errores en el merge
+    df['appid'] = df['appid'].astype(str)
+    df1['appid'] = df1['appid'].astype(str)
+
+    # Unimos ambos DataFrames por appid, conservando solo los juegos presentes en ambas tablas
+    df = pd.merge(df, df1, on='appid', how='inner')
+
+
     # Formateo de columnas para embedding
     df['review_percentage'] = df['review_percentage'].apply(lambda x: f"Porcentaje de recomendación de jugadores: {int(x)}%" if pd.notna(x) else x)
     df['popular_tags'] = df['popular_tags'].apply(lambda x: f"Tags populares: {x}" if pd.notna(x) else x)
@@ -53,11 +78,12 @@ def limpieza(df):
     df['genre'] = df['genre'].apply(lambda x: f"Genero de juego: {x}" if pd.notna(x) else x)
 
     df['embedding'] = (
-        df['game_description'] + '\n' +
         df['genre'] + '\n' +
         df['popular_tags'] + '\n' +
         df['game_details'] + '\n' +
-        df['review_percentage']
+        df['review_percentage']+ '\n' +
+        df['required_age'] + '\n' +
+        df['game_description']
     )
 
     return df

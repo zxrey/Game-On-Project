@@ -9,9 +9,10 @@ load_dotenv(os.path.join(os.path.dirname(__file__), '../../.env'))
 def main():
     # Cargar dataset local, por ejemplo un CSV
     df = pd.read_csv(os.getenv("CSV_PATH"))
+    df1 = pd.read_csv(os.getenv("CSV_PATH_IMG"))
 
     # Limpiar dataset
-    data_limpia = limpieza(df)
+    data_limpia = limpieza(df,df1)
 
     # Generar embeddings (incluye limpieza dentro)
     data_limpia, game_embeddings = embedding(df)
