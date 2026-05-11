@@ -70,14 +70,14 @@ def limpieza(df, df1):
     # Unimos ambos DataFrames por appid, conservando solo los juegos presentes en ambas tablas
     df = pd.merge(df, df1, on='appid', how='inner')
 
-
     # Formateo de columnas para embedding
     df['review_percentage'] = df['review_percentage'].apply(lambda x: f"Percentage of player recommendations: {int(x)}%" if pd.notna(x) else x)
     df['popular_tags'] = df['popular_tags'].apply(lambda x: f"Tags populares: {x}" if pd.notna(x) else x)
     df['game_details'] = df['game_details'].apply(lambda x: f"Tags populares: {x}" if pd.notna(x) else x)
-    df['genre'] = df['genre'].apply(lambda x: f"Genero de juego: {x}" if pd.notna(x) else x)
+    df['genre'] = df['genre'].apply(lambda x: f"Game genre: {x}" if pd.notna(x) else x)
 
     df['embedding'] = (
+        df['name'] + '\n' +
         df['genre'] + '\n' +
         df['popular_tags'] + '\n' +
         df['game_details'] + '\n' +

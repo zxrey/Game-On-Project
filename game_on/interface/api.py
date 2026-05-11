@@ -15,5 +15,5 @@ data_limpia, game_embeddings = embedding(df, df1)
 @app.post("/query")
 def recomendar(payload: dict):
     consulta = payload["query"]
-    resultado = query(consulta, data_limpia, game_embeddings)
-    return {"recommendations": resultado}
+    resultado, consulta_mejorada = query(consulta, data_limpia, game_embeddings)
+    return {"recommendations": resultado, "consulta_mejorada": consulta_mejorada}
