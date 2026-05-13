@@ -1,2 +1,4 @@
 __pycache__/
-raw_data/applications.csv
+.env
+../raw_data/
+../data/cache

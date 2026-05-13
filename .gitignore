@@ -3,3 +3,7 @@ __pycache__/
 *.pyc
 *.pyo
 *.pyd
+.env
+raw_data/
+game_on/raw_data/
+game_on/data/cache
