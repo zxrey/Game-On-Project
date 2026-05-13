@@ -1,17 +1,43 @@
-import re
+import numpy as np
 import pandas as pd
+import re
+
+def calcular_quality_score(row, max_reviews):
+    scores = []
+    pesos = []
+
+    # review_percentage (siempre que exista)
+    if pd.notna(row['review_per']):
+        scores.append(row['review_per'] / 100)
+        pesos.append(0.30)
+
+    # num_reviews normalizado logarítmicamente
+    if pd.notna(row['total_review']) and row['total_review'] > 0:
+        norm = np.log1p(row['total_review']) / np.log1p(max_reviews)
+        scores.append(norm)
+        pesos.append(0.50)
+
+    # metacritic_score (solo si existe)
+    if pd.notna(row['metacritic_score']):
+        scores.append(row['metacritic_score'] / 100)
+        pesos.append(0.20)
+
+    if not scores:
+        return None
+
+    total_pesos = sum(pesos)
+    quality_score = sum(s * p for s, p in zip(scores, pesos)) / total_pesos
+
+    return round(quality_score, 4)
+
+
 
 def limpieza(df, df1):
     # Limpieza de 'recent_reviews'
-    def extract_percentage(text):
-        if not isinstance(text, str):
-            return None
-        match = re.search(r'([-]?\d+)%', text)
-        if match:
-            return int(match.group(1))
-        return None
-
-    df['review_percentage'] = df['recent_reviews'].apply(extract_percentage)
+    df['total_review'] = df['all_reviews'].str.extract(r'\(([\d,]+)\)').iloc[:, 0].str.replace(',', '')
+    df['total_review'] = pd.to_numeric(df['total_review'], errors='coerce')
+    df['review_per'] = df['all_reviews'].str.extract(r'(\d+)%').iloc[:, 0]
+    df['review_per'] = pd.to_numeric(df['review_per'], errors='coerce')
 
     # Se eliminan columnas que no son relevantes para el análisis
     df = df.drop(columns=['types', 'all_reviews', 'desc_snippet', 'recent_reviews', 'developer',
@@ -69,9 +95,9 @@ def limpieza(df, df1):
     df = pd.merge(df, df1, on='appid', how='inner')
 
     # Formateo de columnas para embedding
-    df['review_percentage'] = df['review_percentage'].apply(lambda x: f"Percentage of player recommendations: {int(x)}%" if pd.notna(x) else x)
-    df['popular_tags'] = df['popular_tags'].apply(lambda x: f"Tags populares: {x}" if pd.notna(x) else x)
-    df['game_details'] = df['game_details'].apply(lambda x: f"Tags populares: {x}" if pd.notna(x) else x)
+    df['review_percentage'] = df['review_per'].apply(lambda x: f"Percentage of player recommendations: {int(x)}%" if pd.notna(x) else x)
+    df['popular_tags'] = df['popular_tags'].apply(lambda x: f"Popular tags: {x}" if pd.notna(x) else x)
+    df['game_details'] = df['game_details'].apply(lambda x: f"Game details: {x}" if pd.notna(x) else x)
     df['genre'] = df['genre'].apply(lambda x: f"Game genre: {x}" if pd.notna(x) else x)
 
     df['embedding'] = (
@@ -82,6 +108,11 @@ def limpieza(df, df1):
         df['review_percentage']+ '\n' +
         df['required_age'] + '\n' +
         df['game_description']
+    )
+
+    max_reviews = df['total_review'].max()
+    df['quality_score'] = df.apply(
+        lambda row: calcular_quality_score(row, max_reviews), axis=1
     )
 
     return df
