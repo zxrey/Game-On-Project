@@ -1,7 +1,5 @@
-import numpy as np
-import pandas as pd
-import matplotlib
 import re
+import pandas as pd
 
 def limpieza(df, df1):
     # Limpieza de 'recent_reviews'

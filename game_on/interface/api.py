@@ -10,10 +10,21 @@ app = FastAPI()
 
 df = pd.read_csv(os.getenv("CSV_PATH"))
 df1 = pd.read_csv(os.getenv("CSV_PATH_IMG"))
+
+# Embeddings se calculan al arrancar (VERSIÓN ORIGINAL)
 data_limpia, game_embeddings = embedding(df, df1)
 
 @app.post("/query")
 def recomendar(payload: dict):
     consulta = payload["query"]
-    resultado, consulta_mejorada = query(consulta, data_limpia, game_embeddings)
-    return {"recommendations": resultado, "consulta_mejorada": consulta_mejorada}
+
+    resultado, consulta_mejorada = query(
+        consulta,
+        data_limpia,
+        game_embeddings
+    )
+
+    return {
+        "recommendations": resultado,
+        "consulta_mejorada": consulta_mejorada
+    }
