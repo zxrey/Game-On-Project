@@ -1,0 +1,8 @@
+game_on/data/
+notebooks/
+raw_data/
+.env
+__pycache__/
+*.pyc
+*.pt
+*.pkl

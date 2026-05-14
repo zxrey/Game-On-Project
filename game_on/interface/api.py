@@ -1,6 +1,6 @@
 from fastapi import FastAPI
 from pln_model.sbert import query
-from pln_model.params import MODEL_TARGET, EMBEDDINGS_PATH, DATA_PATH, BUCKET_NAME
+from pln_model.params import MODEL_TARGET, EMBEDDINGS_PATH, DATA_PATH, BUCKET_NAME, GCP_PROJECT
 import pandas as pd
 import torch
 
@@ -15,7 +15,7 @@ elif MODEL_TARGET == "gcs":
     print("✅ Descargando desde GCS...")
     from google.cloud import storage
 
-    client = storage.Client()
+    client = storage.Client(project=GCP_PROJECT)  # ← agrega project aquí
     bucket = client.bucket(BUCKET_NAME)
 
     bucket.blob("game_embeddings.pt").download_to_filename("game_embeddings.pt")
