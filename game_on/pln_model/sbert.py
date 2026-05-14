@@ -7,6 +7,11 @@ import os
 from dotenv import load_dotenv
 load_dotenv()
 from groq import Groq
+
+# Configuración del modelo SBERT
+model_name = 'paraphrase-multilingual-mpnet-base-v2'
+model = SentenceTransformer(model_name)
+
 # ---------------- GROQ ----------------
 groq_client = Groq(api_key=os.getenv("GROQ_API_KEY"))
 
@@ -40,9 +45,7 @@ def generar_descripcion(game, consulta):
 
 
 # ---------------- SBERT ----------------
-# Configuración del modelo SBERT
-model_name = 'paraphrase-multilingual-mpnet-base-v2'
-model = SentenceTransformer(model_name)
+
 
 def embedding(df, df1):
     # Limpieza del dataframe

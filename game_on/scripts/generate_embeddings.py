@@ -25,11 +25,7 @@ embeddings = model.encode(
     show_progress_bar=True
 )
 
-df_clean.to_parquet(f"{CACHE_DIR}/cleaned_games.parquet")
-
-torch.save(
-    embeddings,
-    f"{CACHE_DIR}/embeddings.pt"
-)
-
-print("Embeddings generados correctamente")
+# 3. Guardar localmente
+df_clean.to_pickle(f"{CACHE_DIR}/df_clean.pkl")
+torch.save(embeddings, f"{CACHE_DIR}/game_embeddings.pt")
+print("✅ Archivos guardados localmente")

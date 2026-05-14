@@ -1,18 +1,30 @@
 from fastapi import FastAPI
-from pln_model.sbert import embedding, query
+from pln_model.sbert import query
+from pln_model.params import MODEL_TARGET, EMBEDDINGS_PATH, DATA_PATH, BUCKET_NAME
 import pandas as pd
-import os
-from dotenv import load_dotenv
-
-load_dotenv(os.path.join(os.path.dirname(__file__), '../../.env'))
+import torch
 
 app = FastAPI()
 
-df = pd.read_csv(os.getenv("CSV_PATH"))
-df1 = pd.read_csv(os.getenv("CSV_PATH_IMG"))
+if MODEL_TARGET == "local":
+    print("✅ Cargando desde local...")
+    app.state.game_embeddings = torch.load(EMBEDDINGS_PATH)
+    app.state.data_limpia = pd.read_pickle(DATA_PATH)
 
-# Embeddings se calculan al arrancar (VERSIÓN ORIGINAL)
-data_limpia, game_embeddings = embedding(df, df1)
+elif MODEL_TARGET == "gcs":
+    print("✅ Descargando desde GCS...")
+    from google.cloud import storage
+
+    client = storage.Client()
+    bucket = client.bucket(BUCKET_NAME)
+
+    bucket.blob("game_embeddings.pt").download_to_filename("game_embeddings.pt")
+    bucket.blob("df_clean.pkl").download_to_filename("df_clean.pkl")
+
+    app.state.game_embeddings = torch.load("game_embeddings.pt")
+    app.state.data_limpia = pd.read_pickle("df_clean.pkl")
+
+print("✅ API lista")
 
 @app.post("/query")
 def recomendar(payload: dict):
@@ -20,8 +32,8 @@ def recomendar(payload: dict):
 
     resultado, consulta_mejorada = query(
         consulta,
-        data_limpia,
-        game_embeddings
+        app.state.data_limpia,
+        app.state.game_embeddings
     )
 
     return {
