@@ -20,4 +20,4 @@ ENV MODEL_TARGET=gcs \
 
 EXPOSE 8000
 
-CMD uvicorn game_on.interface.api:app --host 0.0.0.0 --port $PORT
+CMD ["sh", "-c", "uvicorn game_on.interface.api:app --host 0.0.0.0 --port $PORT"]
