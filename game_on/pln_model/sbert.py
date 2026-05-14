@@ -18,17 +18,18 @@ groq_client = Groq(api_key=os.getenv("GROQ_API_KEY"))
 def mejorar_consulta(consulta):
     response = groq_client.chat.completions.create(
         model="llama-3.3-70b-versatile",  # modelo más grande y preciso
-        messages=[{"role": "user", "content": f"""Eres un experto en videojuegos.
-        Dado este texto de búsqueda: '{consulta}', devuelve exactamente la misma
-        consulta original y agrega máximo 5 palabras clave en inglés que describan
-        el género, mecánicas y estilo de juego más relevantes.
+        messages=[{"role": "user", "content": f"""You are a video game expert.
+        Given this search query: '{consulta}'
 
-        Ejemplos:
-        - 'kill demons fast' → 'kill demons fast, FPS, shooter, fast-paced, action, gore'
-        - 'juego de construcción tranquilo' → 'juego de construcción tranquilo, farming, simulation, relaxing, building'
-        - 'juego difícil con espadas' → 'juego difícil con espadas, soulslike, challenging, medieval, combat'
+        1. Extract the main theme/enemy/setting keywords
+        2. Repeat those keywords 3 times to give them more weight
+        3. Add 5 related gaming terms in English
 
-        Solo devuelve las palabras sin explicación ni formato adicional."""}],
+        Example:
+        'kill horde of demons' → 'demons demons demons, kill horde of demons,
+        demon slayer, hellish, gore, FPS, shooter'
+
+        Return only the words, no explanation."""}],
         max_tokens=200
     )
     return response.choices[0].message.content
