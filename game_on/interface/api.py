@@ -8,21 +8,24 @@ app = FastAPI()
 
 if MODEL_TARGET == "local":
     print("✅ Cargando desde local...")
-    app.state.game_embeddings = torch.load(EMBEDDINGS_PATH)
+    app.state.game_embeddings = torch.load(EMBEDDINGS_PATH, map_location=torch.device('cpu'))
     app.state.data_limpia = pd.read_pickle(DATA_PATH)
 
 elif MODEL_TARGET == "gcs":
     print("✅ Descargando desde GCS...")
     from google.cloud import storage
 
-    client = storage.Client(project=GCP_PROJECT)  # ← agrega project aquí
+    client = storage.Client(project=GCP_PROJECT)
     bucket = client.bucket(BUCKET_NAME)
 
-    bucket.blob("game_embeddings.pt").download_to_filename("game_embeddings.pt")
-    bucket.blob("df_clean.pkl").download_to_filename("df_clean.pkl")
+    bucket.blob("game_embeddings.pt").download_to_filename("/tmp/game_embeddings.pt")
+    bucket.blob("df_clean.pkl").download_to_filename("/tmp/df_clean.pkl")
 
-    app.state.game_embeddings = torch.load("game_embeddings.pt")
-    app.state.data_limpia = pd.read_pickle("df_clean.pkl")
+    app.state.game_embeddings = torch.load(
+        "/tmp/game_embeddings.pt",
+        map_location=torch.device('cpu')
+    )
+    app.state.data_limpia = pd.read_pickle("/tmp/df_clean.pkl")
 
 print("✅ API lista")
 
