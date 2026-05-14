@@ -1,7 +1,4 @@
-google-cloud-storage
-pyarrow
-
-
+google-cloud-storage==3.10.1
 numpy==2.2.6
 pandas==2.3.3
 sentence-transformers==5.4.1
