@@ -18,6 +18,4 @@ ENV MODEL_TARGET=gcs \
     GCP_PROJECT=wagon-bootcamp-490420 \
     PYTHONPATH=/app/game_on
 
-EXPOSE 8000
-
 CMD ["sh", "-c", "uvicorn game_on.interface.api:app --host 0.0.0.0 --port $PORT"]
