@@ -4,13 +4,14 @@ A semantic search engine for video games that understands natural language queri
 
 **Team:** 4 members | **Dataset:** ~30,000 Steam games
 
-🔗 [Live Demo](https://your-streamlit-link-here) <!-- reemplaza con tu link real -->
+🔗 [Live Demo](https://game-on-frontend-34uayvdzekl6rnqlg8xpiu.streamlit.app/)
 
 ---
 
 ## 📸 Demo
 
-![Game-On Demo](screenshot.png) <!-- reemplaza con tu screenshot -->
+<img width="1292" height="874" alt="Captura de pantalla 2026-05-28 135932" src="https://github.com/user-attachments/assets/81347440-0dc2-49ed-83b3-39054e054729" />
+
 
 ---
 
