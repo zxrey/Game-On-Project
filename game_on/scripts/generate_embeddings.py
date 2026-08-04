@@ -3,8 +3,8 @@ import torch
 import os
 
 from dotenv import load_dotenv
-from pln_model.sbert import model
-from pln_model.limpieza import limpieza
+from nlp_model.embeddings import model
+from nlp_model.cleaning import limpieza
 
 load_dotenv()
 

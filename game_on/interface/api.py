@@ -1,7 +1,7 @@
 from fastapi import FastAPI
 from pydantic import BaseModel
-from pln_model.sbert import query
-from pln_model.params import MODEL_TARGET, EMBEDDINGS_PATH, DATA_PATH, BUCKET_NAME, GCP_PROJECT
+from nlp_model.search import query
+from nlp_model.params import MODEL_TARGET, EMBEDDINGS_PATH, DATA_PATH, BUCKET_NAME, GCP_PROJECT
 import pandas as pd
 import torch
 

@@ -1,5 +1,6 @@
 import pandas as pd
-from pln_model.sbert import embedding, query
+from nlp_model.embeddings import embedding
+from nlp_model.search import query
 import os
 from dotenv import load_dotenv
 
