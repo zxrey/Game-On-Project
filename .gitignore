@@ -8,5 +8,7 @@ __pycache__/
 raw_data/
 game_on/raw_data/
 game_on/data/
-notebooks/
+notebooks/*.pkl
+notebooks/*.pt
+.ipynb_checkpoints/
 
