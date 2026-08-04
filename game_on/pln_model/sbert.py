@@ -16,33 +16,42 @@ model = SentenceTransformer(model_name)
 groq_client = Groq(api_key=os.getenv("GROQ_API_KEY"))
 
 def mejorar_consulta(consulta):
-    response = groq_client.chat.completions.create(
-        model="llama-3.3-70b-versatile",  # modelo más grande y preciso
-        messages=[{"role": "user", "content": f"""You are a video game expert.
+    try:
+        response = groq_client.chat.completions.create(
+            model="llama-3.3-70b-versatile",  # modelo más grande y preciso
+            messages=[{"role": "user", "content": f"""You are a video game expert.
         Given this search query: '{consulta}'
 
-        1. Extract the main theme/enemy/setting keywords
-        2. Repeat those keywords 3 times to give them more weight
-        3. Add 5 related gaming terms in English
+        1. Translate the query to English if it is in another language
+        2. Write the translated query
+        2. Extract the main theme/enemy/setting keywords
+        3. Repeat those keywords 3 times to give them more weight
+        4. Add 5 related gaming terms in English
 
         Example:
         'kill horde of demons' → 'demons demons demons, kill horde of demons,
         demon slayer, hellish, gore, FPS, shooter'
 
         Return only the words, no explanation."""}],
-        max_tokens=200
-    )
-    return response.choices[0].message.content
+            max_tokens=200
+        )
+        return response.choices[0].message.content
+    except Exception:
+        # Si Groq falla, seguimos la búsqueda con la consulta original sin mejorar
+        return consulta
 
 def generar_descripcion(game, consulta):
     # Genera una descripción personalizada explicando por qué el juego es una buena recomendación
-    response = groq_client.chat.completions.create(
-        model="llama-3.1-8b-instant",
-        messages=[{"role": "user",
-                   "content": f"En 2 oraciones explica por qué el juego '{game['name']}' ({game['genre']}) es una buena recomendación para alguien que busca: {consulta}"}],
-        max_tokens=150
-    )
-    return response.choices[0].message.content
+    try:
+        response = groq_client.chat.completions.create(
+            model="llama-3.1-8b-instant",
+            messages=[{"role": "user",
+                       "content": f"En 2 oraciones explica por qué el juego '{game['name']}' ({game['genre']}) es una buena recomendación para alguien que busca: {consulta}"}],
+            max_tokens=150
+        )
+        return response.choices[0].message.content
+    except Exception:
+        return "No se pudo generar una descripción para este juego en este momento."
 
 
 # ---------------- SBERT ----------------
@@ -61,22 +70,31 @@ def embedding(df, df1):
 
 # ---------------- STEAM API ----------------
 def get_steam_data(appid):
-    # Consulta la API de Steam para obtener datos en tiempo real del juego
-    url = f"https://store.steampowered.com/api/appdetails?appids={appid}"
-    response = requests.get(url)
-    data = response.json()
+    # Consultamos la API de Steam con cc=pe para obtener precios en soles peruanos
+    url = f"https://store.steampowered.com/api/appdetails?appids={appid}&cc=pe"
+    try:
+        response = requests.get(url, timeout=10)
+        data = response.json()
 
-    # Verifica que la respuesta sea exitosa
-    if data[str(appid)]['success']:
-        game = data[str(appid)]['data']
-        return {
-            # Precio formateado (ej: "$19.99")
-            'price': game.get('price_overview', {}).get('final_formatted'),
-            # Porcentaje de descuento (ej: 50 para 50% de descuento)
-            'discount': game.get('price_overview', {}).get('discount_percent'),
-            # URL del trailer en mp4 a 480p si existe
-            'trailer': game.get('movies', [{}])[0].get('hls_h264') if game.get('movies') else None
-        }
+        # Verificamos que la respuesta sea exitosa
+        if data[str(appid)]['success']:
+            game = data[str(appid)]['data']
+            price_overview = game.get('price_overview', {})
+
+            return {
+                # Precio final con descuento aplicado (ej: S/.16.40)
+                'price': price_overview.get('final_formatted'),
+                # Precio original sin descuento (ej: S/.82.00)
+                'original_price': price_overview.get('initial_formatted'),
+                # Porcentaje de descuento (ej: 80)
+                'discount': price_overview.get('discount_percent'),
+                # URL del trailer en formato HLS si existe
+                'trailer': game.get('movies', [{}])[0].get('hls_h264') if game.get('movies') else None
+            }
+    except (requests.RequestException, ValueError, KeyError):
+        # Precio/trailer son datos secundarios: si Steam falla, seguimos sin ellos
+        pass
+
     return {}
 
 #----------reordenar por quality------
@@ -118,22 +136,14 @@ def query(consulta, df, game_embeddings, n_top=1000):
     resultados = []
     for score, idx in zip(top_results.values, top_results.indices):
         game = df.iloc[idx.item()]
-#        descripcion = generar_descripcion(game, consulta)
-
-        # Consultamos Steam en tiempo real para obtener precio y trailer actualizados
-#        steam_data = get_steam_data(game['appid'])
 
         resultados.append({
             'name': game['name'],
             'header_image': game['header_image'],
             'match': round(score.item(), 4),
             'quality_score': float(game['quality_score']) if pd.notna(game['quality_score']) else 0.0,
-#            'descripcion': descripcion,
             'genre': game['genre'],
             'popular_tags': game['popular_tags'],
-#            'original_price': steam_data.get('price'),
-#            'discount': steam_data.get('discount', 0),
-#            'trailer': steam_data.get('trailer'),
             'review_percentage': game['review_percentage'],
             'appid': game['appid'],
             'url': game['url']
@@ -147,7 +157,8 @@ def query(consulta, df, game_embeddings, n_top=1000):
     for juego in resultados:
         juego['descripcion'] = generar_descripcion(juego, consulta)
         steam_data = get_steam_data(juego['appid'])
-        juego['original_price'] = steam_data.get('price')
+        juego['original_price'] = steam_data.get('original_price')
+        juego['price'] = steam_data.get('price')
         juego['discount'] = steam_data.get('discount', 0)
         juego['trailer'] = steam_data.get('trailer')
 

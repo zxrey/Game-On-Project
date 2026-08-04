@@ -1,5 +1,4 @@
 import pandas as pd
-from pln_model.limpieza import limpieza
 from pln_model.sbert import embedding, query
 import os
 from dotenv import load_dotenv
@@ -11,14 +10,11 @@ def main():
     df = pd.read_csv(os.getenv("CSV_PATH"))
     df1 = pd.read_csv(os.getenv("CSV_PATH_IMG"))
 
-    # Limpiar dataset
-    data_limpia = limpieza(df,df1)
-
     # Generar embeddings (incluye limpieza dentro)
-    data_limpia, game_embeddings = embedding(df)
+    data_limpia, game_embeddings = embedding(df, df1)
 
     # Ejecutar query (consulta)
-    resultado = query("kill demon hordes, Gore, single player, shooter, first person", data_limpia, game_embeddings, n_top=5)
+    resultado, consulta_mejorada = query("kill demon hordes, Gore, single player, shooter, first person", data_limpia, game_embeddings, n_top=5)
 
     print(resultado)
 

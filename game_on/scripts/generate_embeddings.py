@@ -8,7 +8,7 @@ from pln_model.limpieza import limpieza
 
 load_dotenv()
 
-CACHE_DIR = "data/cache"
+CACHE_DIR = "data"
 
 os.makedirs(CACHE_DIR, exist_ok=True)
 

@@ -4,6 +4,9 @@ __pycache__/
 *.pyo
 *.pyd
 .env
+.env.yaml
 raw_data/
 game_on/raw_data/
-game_on/data/cache
+game_on/data/
+notebooks/
+

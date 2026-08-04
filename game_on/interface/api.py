@@ -1,10 +1,16 @@
 from fastapi import FastAPI
+from pydantic import BaseModel
 from pln_model.sbert import query
 from pln_model.params import MODEL_TARGET, EMBEDDINGS_PATH, DATA_PATH, BUCKET_NAME, GCP_PROJECT
 import pandas as pd
 import torch
 
 app = FastAPI()
+
+
+class QueryRequest(BaseModel):
+    query: str
+
 
 if MODEL_TARGET == "local":
     print("✅ Cargando desde local...")
@@ -30,11 +36,9 @@ elif MODEL_TARGET == "gcs":
 print("✅ API lista")
 
 @app.post("/query")
-def recomendar(payload: dict):
-    consulta = payload["query"]
-
+def recomendar(payload: QueryRequest):
     resultado, consulta_mejorada = query(
-        consulta,
+        payload.query,
         app.state.data_limpia,
         app.state.game_embeddings
     )

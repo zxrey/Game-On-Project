@@ -1,7 +1,7 @@
 import torch
 import pandas as pd
 
-CACHE_DIR = "data/cache"
+CACHE_DIR = "data"
 
 def load_cached_data():
 
