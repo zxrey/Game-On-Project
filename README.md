@@ -11,6 +11,18 @@ A semantic search engine for video games that understands natural language queri
 
 ---
 
+## Table of Contents
+- [Demo](#-demo)
+- [Goal](#-goal)
+- [How It Works](#-how-it-works)
+- [Local Setup](#-local-setup)
+- [Project Structure](#-project-structure)
+- [Tech Stack](#-tech-stack)
+- [Features](#-features)
+- [Team](#-team)
+
+---
+
 ## 📸 Demo
 
 <img width="1292" height="874" alt="Captura de pantalla 2026-05-28 135932" src="https://github.com/user-attachments/assets/81347440-0dc2-49ed-83b3-39054e054729" />
@@ -49,7 +61,9 @@ That objective shaped the questions the project set out to answer:
 ### Requirements
 - Python 3.10
 - A [Groq](https://console.groq.com) API key (free tier works)
-- The Steam Games dataset from Kaggle (two CSVs: game listings + app details/images)
+- Two Kaggle datasets (place both CSVs under `raw_data/` at the repo root):
+  - [Steam Games Complete Dataset](https://www.kaggle.com/datasets/trolukovich/steam-games-complete-dataset/data) → `steam_games.csv`
+  - [Steam Games Dataset 2025](https://www.kaggle.com/datasets/abhishekgupta56447/steam-games-dataset-2025) → `applications.csv`
 
 ### 1. Clone and install dependencies
 ```bash
@@ -63,24 +77,22 @@ Create a `.env` file in the project root:
 ```env
 GROQ_API_KEY=your_groq_api_key
 MODEL_TARGET=local
-CSV_PATH=../raw_data/steam_games.csv
-CSV_PATH_IMG=../raw_data/applications.csv
+CSV_PATH=raw_data/steam_games.csv
+CSV_PATH_IMG=raw_data/applications.csv
 DATA_PATH=data/df_clean.pkl
 EMBEDDINGS_PATH=data/game_embeddings.pt
 ```
-`CSV_PATH`/`CSV_PATH_IMG` point to the raw Kaggle CSVs (place them under `raw_data/` at the repo root); `DATA_PATH`/`EMBEDDINGS_PATH` are resolved relative to `game_on/`, where the API expects to find them.
+`CSV_PATH`/`CSV_PATH_IMG` point to the raw Kaggle CSVs (place them under `raw_data/` at the repo root); `DATA_PATH`/`EMBEDDINGS_PATH` are resolved relative to the repo root, where the API expects to find them.
 
 ### 3. Generate the cleaned dataset and embeddings
 The cleaned dataset and SBERT embeddings aren't shipped in the repo (they're large binary files, ~100MB). Generate them once:
 ```bash
-cd game_on
 python scripts/generate_embeddings.py
 ```
-This cleans the raw CSVs and saves `df_clean.pkl` and `game_embeddings.pt` to `game_on/data/`.
+This cleans the raw CSVs and saves `df_clean.pkl` and `game_embeddings.pt` to `data/`.
 
 ### 4. Run the API
 ```bash
-cd game_on
 uvicorn interface.api:app --reload
 ```
 Query it:
@@ -94,6 +106,32 @@ curl -X POST http://localhost:8000/query \
 
 ---
 
+## 🗂️ Project Structure
+
+```
+Game-On-Project/
+├── interface/           # FastAPI app
+│   ├── api.py            # /query endpoint
+│   └── main.py           # local CLI entry point for manual testing
+├── nlp_model/            # search pipeline, one file per responsibility
+│   ├── cleaning.py        # raw data cleaning + quality_score
+│   ├── embeddings.py      # SBERT model + embedding generation
+│   ├── llm.py              # Groq query enhancement + result descriptions
+│   ├── scoring.py          # match/quality re-ranking
+│   ├── search.py           # orchestrates the end-to-end query
+│   ├── steam.py            # Steam API price/trailer enrichment
+│   └── params.py           # environment variables
+├── scripts/
+│   └── generate_embeddings.py   # one-off: raw CSVs -> cleaned data/embeddings
+├── notebooks/             # 01_cleaning -> 02_feature_engineering -> 03_EDA -> 04_modeling
+├── raw_data/              # raw Kaggle CSVs (gitignored, see Local Setup)
+├── data/                  # cleaned dataset + embeddings (gitignored, generated locally)
+├── Dockerfile
+└── requirements.txt
+```
+
+---
+
 ## 🛠️ Tech Stack
 
 | Area | Tools |
@@ -104,7 +142,7 @@ curl -X POST http://localhost:8000/query \
 | Data processing | Pandas · NumPy |
 | Frontend | Streamlit |
 | Deployment | Google Cloud Platform |
-| Data source | Kaggle — Steam Games dataset |
+| Data source | Kaggle — [Steam Games Complete Dataset](https://www.kaggle.com/datasets/trolukovich/steam-games-complete-dataset/data), [Steam Games Dataset 2025](https://www.kaggle.com/datasets/abhishekgupta56447/steam-games-dataset-2025) |
 
 ---
 

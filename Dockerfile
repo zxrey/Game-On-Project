@@ -11,11 +11,11 @@ COPY requirements.txt .
 
 RUN pip install --no-cache-dir -r requirements.txt
 
-COPY game_on/ ./game_on/
+COPY interface/ ./interface/
+COPY nlp_model/ ./nlp_model/
 
 ENV MODEL_TARGET=${MODEL_TARGET} \
     BUCKET_NAME=${BUCKET_NAME} \
-    GCP_PROJECT=${GCP_PROJECT} \
-    PYTHONPATH=/app/game_on
+    GCP_PROJECT=${GCP_PROJECT}
 
-CMD ["sh", "-c", "uvicorn game_on.interface.api:app --host 0.0.0.0 --port $PORT"]
+CMD ["sh", "-c", "uvicorn interface.api:app --host 0.0.0.0 --port $PORT"]

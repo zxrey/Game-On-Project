@@ -4,7 +4,7 @@ from nlp_model.search import query
 import os
 from dotenv import load_dotenv
 
-load_dotenv(os.path.join(os.path.dirname(__file__), '../../.env'))
+load_dotenv(os.path.join(os.path.dirname(__file__), '../.env'))
 
 def main():
     # Cargar dataset local, por ejemplo un CSV
