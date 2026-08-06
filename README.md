@@ -1,4 +1,4 @@
-# 🎮 Game-On — Semantic Video Game Search Engine
+# 🎮 Game-On - Semantic Video Game Search Engine
 
 A semantic search engine for video games that understands natural language queries in English and Spanish. Built as a final project for the Le Wagon Data Science & AI Bootcamp (2025).
 
