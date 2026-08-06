@@ -2,6 +2,9 @@
 
 A semantic search engine for video games that understands natural language queries in English and Spanish. Built as a final project for the Le Wagon Data Science & AI Bootcamp (2025).
 
+**Business question:**
+> What if you could just describe the game you want, in your own words, and get a match that actually fits?
+
 **Team:** 4 members | **Dataset:** ~30,000 Steam games
 
 🔗 [Live Demo](https://game-on-frontend-34uayvdzekl6rnqlg8xpiu.streamlit.app/)
@@ -18,8 +21,6 @@ A semantic search engine for video games that understands natural language queri
 ## 🎯 Goal
 
 Steam's catalog has grown to ~30,000 titles, but discovery still mostly relies on exact tags and filters — you have to already know what you're looking for. **Game-On** started from a simpler premise:
-
-> What if you could just describe the game you want, in your own words, and get a match that actually fits?
 
 The objective was to build a search engine that anyone — not just Steam power users — could use to find a game that matches their mood or interests, by typing a natural-language query in English or Spanish instead of navigating tag filters.
 
